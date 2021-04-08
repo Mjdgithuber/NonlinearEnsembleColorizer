@@ -4,6 +4,7 @@ class Palette {
 	color currentColor;
 	int padX, padY;
 	int x, y, width, height, boxSize, boxHor, boxVer;
+	color[][] cArr;
 	public Palette(int _x, int _y, int _width, int _height, int _box_size, int _box_hor, int _box_ver) {
 		x = _x;
 		y = _y;
@@ -17,7 +18,27 @@ class Palette {
 		padY = (height - boxSize * boxVer) / (boxVer - 1);
 
 		currentColor = red;
+		cArr = new color[boxVer][boxHor];
 		print(padX, padY, boxSize);
+	}
+
+	color getColor(int index) {
+		int tmp = index/boxVer;
+		return cArr[tmp][index - tmp*boxVer];
+	}
+
+	int getIndex(int _x, int _y) {
+		int i_x = _x - x;
+		int i_y = _y - y;
+		for(int i = 0; i < boxVer; i++) {
+			for(int j = 0; j < boxHor; j++) {
+				if(i_x > (padX + boxSize)*j && i_x < (padX + boxSize)*(j+1)) {
+					if(i_y > (padY + boxSize)*i && i_y < (padY + boxSize)*(i+1))
+						return i*boxVer + j;
+				}
+			}
+		} 
+		return -1;
 	}
 
 	void display() {
@@ -31,6 +52,7 @@ class Palette {
 		for(int i = 0; i < boxVer; i++) {
 			for(int j = 0; j < boxHor; j++) {
 				fill(temp);
+				cArr[i][j] = temp;
 				rect(x + (padX + boxSize)*j, y + (padY + boxSize)*i, boxSize, boxSize);
 				temp = color(red(temp) * shade, green(temp) * shade, blue(temp) * shade);
 			}

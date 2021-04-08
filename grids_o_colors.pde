@@ -118,7 +118,7 @@ void settings() {
 
 void setup() {
 	frame = new MovieFrame("inception.jpg", 0, 0, 477, 268);
-	palette = new Palette(0, 270, 477, 300, 65, 4, 3); 
+	palette = new Palette(0, 270, 477, 300, 65, 3, 3); 
 }
 
 void draw() {
@@ -149,6 +149,9 @@ void mousePressed() {
 		currentColor = defaultColor;    
 	}
 */
+	int index = palette.getIndex(mouseX, mouseY);
+	if(index != -1)
+		print(palette.getColor(index) + "\n");
 
 	if(mouseButton == LEFT) {
 		frame.leftPress(mouseX, mouseY);
