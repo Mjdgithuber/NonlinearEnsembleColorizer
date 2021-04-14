@@ -15,6 +15,7 @@ String preferences_file = "prefs.txt";
 import oscP5.*;
 import netP5.*;
 import processing.video.*;
+import http.requests.*;
 
 OscP5 oscP5;
 /* a NetAddress contains the ip address and port number of a remote location in the network. */
@@ -111,6 +112,8 @@ void setup() {
 	
 	myBroadcastLocation = new NetAddress(server_ip, server_port); // server
 	myLocalMachine = new NetAddress(local_client_ip, local_client_port);
+
+	testHTTP();
 }
 
 void draw() {
@@ -205,4 +208,13 @@ void readPreferencesFile() {
 
 void movieEvent(Movie m) {
 	m.read();
+}
+
+
+
+void testHTTP() {
+	GetRequest get = new GetRequest("http://192.168.1.113/api_test.php");
+	get.send();
+	println("Reponse Content: " + get.getContent());
+	println("Reponse Content-Length Header: " + get.getHeader("Content-Length"));
 }
