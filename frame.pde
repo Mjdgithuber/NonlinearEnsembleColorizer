@@ -1,7 +1,9 @@
+import processing.video.*;
+
 class MovieFrame {
 	color red = #ff807f;
 	int x, y, width, height;
-	PImage frame;
+	// PImage frame;
 
 	int selX, selY, selW, selH;
 
@@ -12,7 +14,12 @@ class MovieFrame {
 	int zone;
 	int zoneStartX, zoneStartY;
 
-	public MovieFrame(String frame, int _x, int _y, int _width, int _height) {
+	Movie frame;
+	PApplet parent;
+
+	public MovieFrame(PApplet _parent, String frame, int _x, int _y, int _width, int _height) {
+		parent = _parent;
+
 		x = _x;
 		y = _y;
 		width = _width;
@@ -72,7 +79,17 @@ class MovieFrame {
 	}
 
 	void changeFrame(String newFrame) {
-		frame = loadImage(newFrame);
+		frame = new Movie(parent, newFrame);
+		frame.loop();
+		// frame = loadImage(newFrame);
+	}
+
+	public void draw() {
+		image(frame, 0, 0, width, height);
+	}
+
+	public void updateFrame() {
+		frame.read();
 	}
 
 	public color getAvgerageColor() {
@@ -83,7 +100,7 @@ class MovieFrame {
 		int num = 0;
 		for(int i = 0; i < selW; i++) {
 			for(int j = 0; j < selH; j++) {
-				color c = frame.get(selX + i, selY + j);
+				color c = frame.get((selX + i) * (frame.width / width), (selY + j) * (frame.height / height));
 				r += red(c);
 				g += green(c);
 				b += blue(c);

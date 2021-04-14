@@ -1,24 +1,7 @@
-// Your name here x
-//String client_name = "Rob";
-//int client_id = 9;
- 
-
-
-
-
 // MJD
-
-
-
 
 MovieFrame frame;
 Palette palette;
-
-
-
-
-
-
 
 String client_name;
 int client_id = -1; // starting value for 
@@ -27,10 +10,11 @@ int server_port;
 String local_client_ip; 
 int local_client_port;
 
-String preferences_file = "gridClient_preferences.txt";
+String preferences_file = "prefs.txt";
 
 import oscP5.*;
 import netP5.*;
+import processing.video.*;
 
 OscP5 oscP5;
 /* a NetAddress contains the ip address and port number of a remote location in the network. */
@@ -117,14 +101,24 @@ void settings() {
 }
 
 void setup() {
-	frame = new MovieFrame("inception.jpg", 0, 0, 477, 268);
-	palette = new Palette(0, 270, 477, 300, 65, 3, 3); 
+	frame = new MovieFrame(this, "mkl.mp4", 0, 0, 477, 268);
+	palette = new Palette(0, 270, 477, 300, 65, 5, 3); 
+
+	// read init preferences
+	readPreferencesFile();
+	
+	oscP5 = new OscP5(this, 12000); 
+	
+	myBroadcastLocation = new NetAddress(server_ip, server_port); // server
+	myLocalMachine = new NetAddress(local_client_ip, local_client_port);
 }
 
 void draw() {
 	palette.update(frame.getAvgerageColor());
 	background(currentColor);
 
+	// frame.draw();
+	// frame.updateFrame();
 	frame.display();
 	palette.display();
 
@@ -140,19 +134,25 @@ void setActiveSound(int sound)
 }
 
 void mousePressed() {
-
-	/*
-	if (circleOver) {
-		currentColor = circleColor;
-	}
-	if (rectOver) {
-		currentColor = defaultColor;    
-	}
-*/
-	int index = palette.getIndex(mouseX, mouseY);
-	if(index != -1)
-		print(palette.getColor(index) + "\n");
-
+ 
+	print("hellooooo");
+ 
+ int index = palette.getIndex(mouseX, mouseY);
+ 
+ if(index != -1) {
+	 
+	 float currentRed = red(palette.getColor(index));
+	 float currentGreen = green(palette.getColor(index));
+	 float currentBlue = blue(palette.getColor(index));
+	 
+	 sendOscNote(index, currentRed, currentGreen, currentBlue);
+	 print(red(palette.getColor(index)) + "\n");  
+ }
+ 
+ 
+ 
+ print(index);
+ 
 	if(mouseButton == LEFT) {
 		frame.leftPress(mouseX, mouseY);
 	} else if(mouseButton == RIGHT) {
@@ -174,23 +174,35 @@ void mouseDragged()
 	frame.update(mouseX, mouseY);
 }
 
-/*
-boolean overRect(int x, int y, int width, int height) {
-	if (mouseX >= x && mouseX <= x+width && 
-		mouseY >= y && mouseY <= y+height) {
-		return true;
-	} else {
-		return false;
+// _id is the cell clicked that triggered the send;
+void sendOscNote(int index, float _red, float _green, float _blue){
+		
+		// /grid/client/<user_id> <user_name> <clicked_cell_id> <active_sound> <cell1 color> <cell2 color> ...
+		OscMessage myOscMessage = new OscMessage("/gridocolor");
+		
+		myOscMessage.add(client_id);
+		myOscMessage.add(client_name);
+		myOscMessage.add(index);
+		myOscMessage.add(_red);
+		myOscMessage.add(_green);
+		myOscMessage.add(_blue);
+		print(_red, _green, _blue);
+		
+		oscP5.send(myOscMessage, myBroadcastLocation);    
 	}
+
+void readPreferencesFile() {  
+
+	String[] lines = loadStrings(preferences_file);  
+		 
+	server_ip = lines[0]; 
+	server_port = int(lines[1]);
+	client_name = lines[2];
+	client_id = int(lines[3]);       
+		
+	print(client_id, client_name, server_ip, server_port);
 }
 
-boolean overCircle(int x, int y, int diameter) {
-	float disX = x - mouseX;
-	float disY = y - mouseY;
-	if (sqrt(sq(disX) + sq(disY)) < diameter/2 ) {
-		return true;
-	} else {
-		return false;
-	}
+void movieEvent(Movie m) {
+	m.read();
 }
-*/

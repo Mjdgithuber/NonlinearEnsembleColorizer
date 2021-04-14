@@ -23,8 +23,8 @@ class Palette {
 	}
 
 	color getColor(int index) {
-		int tmp = index/boxVer;
-		return cArr[tmp][index - tmp*boxVer];
+		int tmp = index/boxHor;
+		return cArr[tmp][index - tmp*boxHor];
 	}
 
 	int getIndex(int _x, int _y) {
@@ -34,7 +34,7 @@ class Palette {
 			for(int j = 0; j < boxHor; j++) {
 				if(i_x > (padX + boxSize)*j && i_x < (padX + boxSize)*(j+1)) {
 					if(i_y > (padY + boxSize)*i && i_y < (padY + boxSize)*(i+1))
-						return i*boxVer + j;
+						return i*boxHor + j;
 				}
 			}
 		} 
