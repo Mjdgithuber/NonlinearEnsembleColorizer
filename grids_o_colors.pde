@@ -1,6 +1,7 @@
 // MJD
 
-MovieFrame frame;
+GUIFrame frame;
+// MovieFrame frame;
 Palette palette;
 
 String client_name;
@@ -96,6 +97,8 @@ int currentCellOver = -1;
 
 int currentSelectedSoundCell = -1;
 
+String gui_type;
+
 PImage playButton;
 
 	
@@ -109,13 +112,18 @@ void settings() {
 }
 
 void setup() {
-	frame = new MovieFrame(this, "mkl.mp4", 0, 0, 477, 268);
-	palette = new Palette(0, 270, 477, 300, 65, 5, 3); 
-
 	// read init preferences
 	readPreferencesFile();
+
+
+	if(gui_type.equals("server"))
+		frame = new MovieFrame(this, "mkl.mp4", 0, 0, 477, 268);
+	else
+		frame = new ClientFrame(this, "mkl.mp4", 0, 0, 477, 268);
+
+	palette = new Palette(0, 270, 477, 300, 65, 5, 3); 
 	
-	oscP5 = new OscP5(this, 12000); 
+	oscP5 = new OscP5(this, 12000);
 	
 	myBroadcastLocation = new NetAddress(server_ip, server_port); // server
 	myLocalMachine = new NetAddress(local_client_ip, local_client_port);
@@ -130,14 +138,15 @@ void draw() {
 	background(currentColor);
 
 	// frame.draw();
-	// frame.updateFrame();
+	frame.updateFrame();
 	frame.display();
 	palette.display();
 
 	fill(frame.getAvgerageColor());
 	rect(476, 1, 50, 267);
 
-	image(playButton, 0, 0, 50, 50);
+	if(gui_type.equals("server"))
+		image(playButton, 0, 0, 50, 50);
 }
 
 void keyPressed() {	
@@ -175,7 +184,7 @@ void mousePressed() {
 
 	if(mouseX < 50 && mouseY < 50) {
 		frame.toggleState();
-		if(!frame.isPlaying()) {
+		if(!frame.isPlaying() && gui_type.equals("server")) {
 			frame.writeFrame();
 			testHTTP();
 		}
@@ -220,7 +229,8 @@ void readPreferencesFile() {
 	server_ip = lines[0]; 
 	server_port = int(lines[1]);
 	client_name = lines[2];
-	client_id = int(lines[3]);       
+	client_id = int(lines[3]);
+	gui_type = lines[4];
 		
 	print(client_id, client_name, server_ip, server_port);
 }
@@ -244,6 +254,18 @@ String encodeToBase64(String fileLoc) throws IOException, FileNotFoundException,
 	return encodedBase64;
 }
 
+PImage DecodePImageFromBase64(String b64Image) throws IOException {
+	PImage result = null;
+	byte[] decodedBytes = Base64.decodeBase64(b64Image);
+
+	ByteArrayInputStream in = new ByteArrayInputStream(decodedBytes);
+	BufferedImage bImageFromConvert = ImageIO.read(in);
+	BufferedImage convertedImg = new BufferedImage(bImageFromConvert.getWidth(), bImageFromConvert.getHeight(), BufferedImage.TYPE_INT_ARGB);
+	convertedImg.getGraphics().drawImage(bImageFromConvert, 0, 0, null);
+	result = new PImage(convertedImg);
+
+	return result;
+}
 
 void testHTTP() {
 	print("TESTING...");

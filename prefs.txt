@@ -1,0 +1,16 @@
+127.0.0.1
+6664
+MikeGao
+15
+server
+
+/*
+This preferences file should be named "gridClient_preferences.txt and should be placed in the same directory as the Processing executable. 
+
+The app will read the first four lines of data, anticipating data in this order:
+
+  Target IP address (server)
+  Target Port (server)
+  Username
+  User Id
+*/
