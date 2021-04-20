@@ -17,6 +17,8 @@ class MovieFrame {
 	Movie frame;
 	PApplet parent;
 
+	boolean playing;
+
 	public MovieFrame(PApplet _parent, String frame, int _x, int _y, int _width, int _height) {
 		parent = _parent;
 
@@ -35,6 +37,7 @@ class MovieFrame {
 
 		rightSelected = false;
 		zone = 0;
+		playing = true;
 	}
 
 	private boolean overRect(int mouseX, int mouseY, int x, int y, int width, int height) {
@@ -90,6 +93,25 @@ class MovieFrame {
 
 	public void updateFrame() {
 		frame.read();
+	}
+
+	public void toggleState() {
+		if(playing)
+			frame.pause();
+		else
+			frame.play();
+		playing = !playing;
+	}
+
+	public boolean isPlaying() {
+		return playing;
+	}
+
+	public void writeFrame() {
+		PImage newImage = createImage(477, 268, RGB);
+		newImage = frame.get();
+		newImage.resize(477, 268);
+		newImage.save("frame_dump/frame.jpg");
 	}
 
 	public color getAvgerageColor() {

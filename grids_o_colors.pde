@@ -16,6 +16,11 @@ import oscP5.*;
 import netP5.*;
 import processing.video.*;
 import http.requests.*;
+import org.apache.commons.codec.binary.Base64;
+import java.io.*;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
+import java.net.*;
 
 OscP5 oscP5;
 /* a NetAddress contains the ip address and port number of a remote location in the network. */
@@ -91,6 +96,8 @@ int currentCellOver = -1;
 
 int currentSelectedSoundCell = -1;
 
+PImage playButton;
+
 	
 void settings() {
 	screenSizeX = (gGridOffsetX * 2) + ((gCellWidth + gCellOffsetX) * gGridWidth) - gCellOffsetX + gGridPadLeft + gGridPadRight;
@@ -113,7 +120,9 @@ void setup() {
 	myBroadcastLocation = new NetAddress(server_ip, server_port); // server
 	myLocalMachine = new NetAddress(local_client_ip, local_client_port);
 
-	testHTTP();
+	playButton = loadImage("play.png");
+
+	// testHTTP();
 }
 
 void draw() {
@@ -127,6 +136,8 @@ void draw() {
 
 	fill(frame.getAvgerageColor());
 	rect(476, 1, 50, 267);
+
+	image(playButton, 0, 0, 50, 50);
 }
 
 void keyPressed() {	
@@ -160,6 +171,14 @@ void mousePressed() {
 		frame.leftPress(mouseX, mouseY);
 	} else if(mouseButton == RIGHT) {
 		frame.rightPress(mouseX, mouseY);
+	}
+
+	if(mouseX < 50 && mouseY < 50) {
+		frame.toggleState();
+		if(!frame.isPlaying()) {
+			frame.writeFrame();
+			testHTTP();
+		}
 	}
 			
 }
@@ -211,10 +230,40 @@ void movieEvent(Movie m) {
 }
 
 
+String encodeToBase64(String fileLoc) throws IOException, FileNotFoundException, URISyntaxException {
+	File originalFile = new File(fileLoc);
+	// File originalFile = new File(Thread.currentThread().getContextClassLoader().getResource("data/" + fileLoc).toURI());
+	String encodedBase64 = null;
+
+	FileInputStream fileInputStreamReader = new FileInputStream(originalFile);
+	byte[] bytes = new byte[(int)originalFile.length()];
+	fileInputStreamReader.read(bytes);
+	encodedBase64 = new String(Base64.encodeBase64(bytes));
+	fileInputStreamReader.close();
+
+	return encodedBase64;
+}
+
 
 void testHTTP() {
-	GetRequest get = new GetRequest("http://192.168.1.113/api_test.php");
-	get.send();
-	println("Reponse Content: " + get.getContent());
-	println("Reponse Content-Length Header: " + get.getHeader("Content-Length"));
+	print("TESTING...");
+	try {
+		// print(System.getProperty("user.dir"));
+
+		// print(encodeToBase64("C:/Users/Matthew/Desktop/School Stuff/Spring 2021/Nonlinear Ens/final_project/src/oscGridClient/a/grids_o_colors/data/" + "inception.jpg"));
+		// String pic = encodeToBase64("C:/Users/Matthew/Desktop/School Stuff/Spring 2021/Nonlinear Ens/final_project/src/oscGridClient/a/grids_o_colors/data/" + "inception.jpg");
+		String pic = encodeToBase64("C:/Users/Matthew/Desktop/School Stuff/Spring 2021/Nonlinear Ens/final_project/src/oscGridClient/a/grids_o_colors/frame_dump/frame.jpg");
+		PostRequest post = new PostRequest("http://192.168.1.113/api_test_post.php");
+		post.addData("name", pic);
+		post.send();
+		System.out.println("Reponse Content: " + post.getContent());
+	} catch(Exception e) {
+		e.printStackTrace();;
+		print("Failed Emma");
+	}
+
+	// GetRequest get = new GetRequest("http://192.168.1.113/api_test.php");
+	// get.send();
+	// println("Reponse Content: " + get.getContent());
+	// println("Reponse Content-Length Header: " + get.getHeader("Content-Length"));
 }
