@@ -97,7 +97,7 @@ int currentCellOver = -1;
 
 int currentSelectedSoundCell = -1;
 
-String gui_type;
+String gui_type, server_gui_ip, mp4_loc, dump_loc;
 
 PImage playButton;
 
@@ -117,9 +117,9 @@ void setup() {
 
 
 	if(gui_type.equals("server"))
-		frame = new MovieFrame(this, "mkl.mp4", 0, 0, 477, 268);
+		frame = new MovieFrame(this, mp4_loc, 0, 0, 477, 268, dump_loc);
 	else
-		frame = new ClientFrame(this, "mkl.mp4", 0, 0, 477, 268);
+		frame = new ClientFrame(this, mp4_loc, 0, 0, 477, 268, server_gui_ip);
 
 	palette = new Palette(0, 270, 477, 300, 65, 5, 3); 
 	
@@ -231,6 +231,9 @@ void readPreferencesFile() {
 	client_name = lines[2];
 	client_id = int(lines[3]);
 	gui_type = lines[4];
+	server_gui_ip = lines[5];
+	mp4_loc = lines[6];
+	dump_loc = lines[7];
 		
 	print(client_id, client_name, server_ip, server_port);
 }
@@ -274,8 +277,8 @@ void testHTTP() {
 
 		// print(encodeToBase64("C:/Users/Matthew/Desktop/School Stuff/Spring 2021/Nonlinear Ens/final_project/src/oscGridClient/a/grids_o_colors/data/" + "inception.jpg"));
 		// String pic = encodeToBase64("C:/Users/Matthew/Desktop/School Stuff/Spring 2021/Nonlinear Ens/final_project/src/oscGridClient/a/grids_o_colors/data/" + "inception.jpg");
-		String pic = encodeToBase64("C:/Users/Matthew/Desktop/School Stuff/Spring 2021/Nonlinear Ens/final_project/src/oscGridClient/a/grids_o_colors/frame_dump/frame.jpg");
-		PostRequest post = new PostRequest("http://192.168.1.113/api_test_post.php");
+		String pic = encodeToBase64(dump_loc + "frame.jpg");
+		PostRequest post = new PostRequest("http://" + server_gui_ip + "/api_test_post.php");
 		post.addData("name", pic);
 		post.send();
 		System.out.println("Reponse Content: " + post.getContent());

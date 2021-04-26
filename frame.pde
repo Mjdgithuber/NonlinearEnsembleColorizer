@@ -42,8 +42,9 @@ class ClientFrame implements GUIFrame {
 	PApplet parent;
 	boolean updating;
 	Thread t;
+	String server_ip;
 
-	public ClientFrame(PApplet _parent, String frame, int _x, int _y, int _width, int _height) {
+	public ClientFrame(PApplet _parent, String frame, int _x, int _y, int _width, int _height, String _server_ip) {
 		parent = _parent;
 
 		x = _x;
@@ -62,6 +63,11 @@ class ClientFrame implements GUIFrame {
 		rightSelected = false;
 		zone = 0;
 		current = "";
+		server_ip = _server_ip;
+	}
+
+	public String getServerIP() {
+		return server_ip;
 	}
 
 	private class ImageUpdater implements Runnable {
@@ -73,7 +79,7 @@ class ClientFrame implements GUIFrame {
 		}
 
 		public void run() {
-			GetRequest get = new GetRequest("http://192.168.1.113/api_test_post.php");
+			GetRequest get = new GetRequest("http://" + cf.getServerIP() + "/api_test_post.php");
 			get.send();
 
 			String b64Image = get.getContent();
@@ -329,8 +335,9 @@ class MovieFrame implements GUIFrame {
 	PApplet parent;
 
 	boolean playing;
+	String dump_loc;
 
-	public MovieFrame(PApplet _parent, String frame, int _x, int _y, int _width, int _height) {
+	public MovieFrame(PApplet _parent, String frame, int _x, int _y, int _width, int _height, String _dump_loc) {
 		parent = _parent;
 
 		x = _x;
@@ -349,6 +356,7 @@ class MovieFrame implements GUIFrame {
 		rightSelected = false;
 		zone = 0;
 		playing = true;
+		dump_loc = _dump_loc;
 	}
 
 	private boolean overRect(int mouseX, int mouseY, int x, int y, int width, int height) {
@@ -395,6 +403,7 @@ class MovieFrame implements GUIFrame {
 	void changeFrame(String newFrame) {
 		frame = new Movie(parent, newFrame);
 		frame.loop();
+		frame.volume(0);
 		// frame = loadImage(newFrame);
 	}
 
@@ -422,7 +431,7 @@ class MovieFrame implements GUIFrame {
 		PImage newImage = createImage(477, 268, RGB);
 		newImage = frame.get();
 		newImage.resize(477, 268);
-		newImage.save("frame_dump/frame.jpg");
+		newImage.save(dump_loc + "frame.jpg");
 	}
 
 	public color getAvgerageColor() {

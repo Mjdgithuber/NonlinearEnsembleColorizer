@@ -3,7 +3,11 @@
 MikeGao
 15
 server
+192.168.1.113
+mkl.mp4
+C:/Users/Matthew/Desktop/School Stuff/Spring 2021/Nonlinear Ens/final_project/src/oscGridClient/a/grids_o_colors/frame_dump/
 
+100.8.129.97
 /*
 This preferences file should be named "gridClient_preferences.txt and should be placed in the same directory as the Processing executable. 
 
