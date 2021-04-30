@@ -121,7 +121,7 @@ void setup() {
 	else
 		frame = new ClientFrame(this, mp4_loc, 0, 0, 477, 268, server_gui_ip);
 
-	palette = new Palette(0, 270, 477, 300, 65, 5, 3); 
+	palette = new Palette(0, 270, 477, 300, 65, 4, 3); 
 	
 	oscP5 = new OscP5(this, 12000);
 	
